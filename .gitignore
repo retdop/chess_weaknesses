@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+*.pgn
+*.zip
+stockfish-10-linux/
