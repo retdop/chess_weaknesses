@@ -107,3 +107,5 @@ venv.bak/
 *.zip
 stockfish-10-linux/
 *.pkl
+
+figs/

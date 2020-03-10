@@ -2,6 +2,8 @@ import chess.engine
 from chess.pgn import read_game
 from tqdm import tqdm
 import pickle
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def load_games(filename):
@@ -15,7 +17,7 @@ def load_games(filename):
     return games
 
 
-def save_scores(games):
+def save_scores(games, filename='./lichess_pavermesh_2019-11-05.scores.pkl'):
     engine = chess.engine.SimpleEngine.popen_uci("./stockfish-10-linux/src/stockfish")
     # args="--threads 4")
 
@@ -38,7 +40,7 @@ def save_scores(games):
             info = engine.analyse(board, chess.engine.Limit(time=0.10))
             game_scores.append(info["score"])
         scores[game_id] = game_scores
-    with open('./lichess_pavermesh_2019-11-05.scores.pkl', 'wb') as handle:
+    with open(filename, 'wb') as handle:
         pickle.dump(scores, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -73,11 +75,47 @@ def get_themes(position):
     return themes
 
 
+def get_position_score(pov_score, color):
+    if pov_score.pov(color).is_mate():
+        if pov_score.pov(color).mate() > 0:
+            return 100
+        else:
+            return -100
+    else:
+        return pov_score.pov(color).score()
+
+
+def plot_themes_differences(games, scores):
+    for game in tqdm(games):
+        pavermesh_color = 0 if game.headers['White'] == 'pavermesh' else 1
+        game_id = game.headers['Site'].split('/')[-1]
+        game_themes = thematize_game(game)
+        if game_id not in scores:
+            continue
+
+        game_scores = scores[game_id]
+
+        game_score_differences = [get_position_score(game_scores[i+1], pavermesh_color) - get_position_score(game_scores[i], pavermesh_color)
+                                  for i in range(len(game_scores) - 1)]
+        all_game_themes = set(theme for position_themes in game_themes.values() for theme in position_themes)
+        themes_score_differences = {
+            theme: [game_score_differences[i] for i in range(len(game_score_differences))
+                    if theme in game_themes[str(i)]]
+            for theme in all_game_themes
+        }
+        plt.hist(game_score_differences, bins=20, alpha=0.7, label='All scores differences')
+        for theme, theme_score_differences in themes_score_differences.items():
+            plt.hist(theme_score_differences, bins=20, alpha=0.7, label=theme + ' scores differences')
+        plt.legend()
+        # plt.show()
+        plt.savefig('figs/pavermesh_' + game_id + '_themes successes.png')
+        plt.close()
+
+
 if __name__ == '__main__':
     games_filename = 'lichess_pavermesh_2019-11-05.pgn'
     pavermesh_games = load_games(games_filename)
-    # save_scores(pavermesh_games)
-    # scores_filename = './lichess_pavermesh_2019-11-05.scores.pkl'
-    # scores = load_scores(scores_filename)
-    for game in tqdm(pavermesh_games):
-        print(thematize_game(game))
+    scores_filename = './lichess_pavermesh_2019-11-05.scores.pkl'
+    # save_scores(pavermesh_games, scores_filename)
+    pavermesh_scores = load_scores(scores_filename)
+    plot_themes_differences(pavermesh_games, pavermesh_scores)
