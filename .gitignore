@@ -110,3 +110,5 @@ stockfish*
 
 figures/*
 !figures/examples/
+
+config.py

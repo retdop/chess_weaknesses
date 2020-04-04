@@ -3,7 +3,7 @@ Find your chess weaknesses
 
 ### Setup
 
-- First edit the `config` file to setup your engine path and to edit the file names.
+- First edit the `config` file to setup your engine path and to edit the file names. You can use the config_example file as a template.
 - First execution will be slow as it needs to generate the engine analysis of the last `100` games in the pgn file previously given in the `config` file.
 <br>Current rate is at half a second per move.
 - That should be it. There are no visualization for now (coming soon) but you can use your debugger to check results.
