@@ -105,7 +105,8 @@ venv.bak/
 
 *.pgn
 *.zip
-stockfish-10-linux/
+stockfish*
 *.pkl
 
-figs/
+figures/*
+!figures/examples/
