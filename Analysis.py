@@ -4,13 +4,14 @@ from Engine import Engine
 from utils import get_game_id
 from MistakeAnalyzer import MistakeAnalyzer
 from ThemeAnalyzer import ThemeAnalyzer
+from EndgameAnalyzer import EndgameAnalyzer
 
-MAX_NUMBER_OF_GAMES_TO_ANALYSE = 3
+MAX_NUMBER_OF_GAMES_TO_ANALYSE = 5
 GAMES_ANALYSES_FILENAME = 'scores.pkl'
 PLAYER_NAME = 'pavermesh'
 
 
-class Analysis(MistakeAnalyzer, ThemeAnalyzer):
+class Analysis(MistakeAnalyzer, ThemeAnalyzer, EndgameAnalyzer):
     engine = None
     games_filename = None
     games = {}
@@ -23,15 +24,15 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer):
     # { game_scores: List, best_moves: List}
 
     def __init__(self, engine=None, games_filename=None,
-                 games_analyses_filename=None,
+                 load_scores=True,
                  max_number_of_games_to_analyse=MAX_NUMBER_OF_GAMES_TO_ANALYSE,
                  player=PLAYER_NAME):
         self.player = player
         self.max_number_of_games_to_analyse = max_number_of_games_to_analyse
         self.engine = engine or Engine()
         self.load_games(games_filename=games_filename)
-        if games_analyses_filename:
-            self.engine.load_games_analyses(games_analyses_filename)
+        if load_scores:
+            self.engine.load_games_analyses()
         else:
             self.pre_compute_engine_analyses()
         for game in self.games.values():
@@ -43,7 +44,6 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer):
     def pre_compute_engine_analyses(self):
         games = [self.games[game_id]['raw'] for game_id in self.games]
         self.engine.analyse_all_games(games)
-        self.engine.save_games_analyses()
 
     def load_games(self, games_filename=None):
         if not games_filename and not self.games_filename:
@@ -73,8 +73,10 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer):
 
 if __name__ == '__main__':
     analysis = Analysis(games_filename=GAMES_FILENAME,
-                        games_analyses_filename=GAMES_ANALYSES_FILENAME,
+                        load_scores=True,
                         player=PLAYER_NAME)
     analysis.find_mistakes()
     analysis.thematize_games()
     analysis.plot_themes_differences()
+    analysis.endgamize_games()
+    analysis.plot_endgames_differences()

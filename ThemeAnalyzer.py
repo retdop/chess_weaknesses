@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import os
 from utils import get_player_color, get_position_score
+from Themes import themes
 
 
 class ThemeAnalyzer:
@@ -20,14 +21,14 @@ class ThemeAnalyzer:
 
     def thematize_game(self, raw_game):
         board = raw_game.board()
-        themes = {}
+        game_themes = {}
         for i, move in enumerate(raw_game.mainline_moves()):
             # print(move)
             # print("Score:", info_small["score"])
             # print(board)
             board.push(move)
-            themes[str(i)] = self.get_themes(raw_game, board)
-        return themes
+            game_themes[str(i)] = self.get_themes(raw_game, board)
+        return game_themes
 
     def get_themes(self, raw_game, position):
         player_color = get_player_color(self.player, raw_game)
