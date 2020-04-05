@@ -7,6 +7,7 @@ from utils import get_game_id
 from glob import glob
 
 MAX_ANALYSIS_SECONDS_PER_MOVE = 0.50
+SCORES_DIRECTORY = 'engine_scores/'
 
 
 class Engine:
@@ -67,13 +68,12 @@ class Engine:
         for game in tqdm(games):
             game_id = get_game_id(game)
             games_analyses[game_id] = self.analyse_game(game)
-            with open('stockfish_scores/' + game_id + '.scores.pkl', 'wb') as handle:
+            with open(SCORES_DIRECTORY + game_id + '.scores.pkl', 'wb') as handle:
                 pickle.dump(games_analyses[game_id], handle, protocol=pickle.HIGHEST_PROTOCOL)
         return games_analyses
 
     def load_games_analyses(self):
-        scores_directory = 'stockfish_scores/'
-        for filename in glob(os.path.join(scores_directory, '*.scores.pkl')):
+        for filename in glob(os.path.join(SCORES_DIRECTORY, '*.scores.pkl')):
             with open(os.path.join(os.getcwd(), filename), 'rb') as handle:  # open in readonly mode
                 game_analysis = pickle.load(handle)
                 game_id = filename.split('.')[0][17:]

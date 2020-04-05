@@ -53,18 +53,17 @@ class EndgameAnalyzer:
     def endgamize_game(self, raw_game):
         board = raw_game.board()
         endgames = {}
+        has_entered_endgame = False
         for i, move in enumerate(raw_game.mainline_moves()):
-            # print(move)
-            # print("Score:", info_small["score"])
-            # print(board)
             board.push(move)
-            endgames[str(i)] = self.get_endgame(raw_game, board)
+            endgames[str(i)] = self.get_endgame(raw_game, board, has_entered_endgame)
+            has_entered_endgame = endgames[str(i)] is not None
         return endgames
 
-    def get_endgame(self, raw_game, position):
+    def get_endgame(self, raw_game, position, has_entered_endgame):
         player_color = get_player_color(self.player, raw_game)
         is_endgame = material(position, player_color) <= 13
-        if is_endgame:
+        if has_entered_endgame or is_endgame:
             return pieces_count(position, player_color) + ' vs ' + pieces_count(position, 1 - player_color)
         else:
             return None
