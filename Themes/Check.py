@@ -7,6 +7,7 @@ class Check(Theme):
         for move in position.legal_moves:
             position.push(move)
             if position.is_check():
+                position.pop()
                 return True
             position.pop()
         return False
