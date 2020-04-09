@@ -1,10 +1,13 @@
-from config import DEFAULT_GAMES_ANALYSES_FILENAME, ENGINE_PATH
-from tqdm import tqdm
-import chess.engine
-import pickle
 import os
-from utils import get_game_id
+import pickle
 from glob import glob
+
+import chess.engine
+from chess.engine import EngineError
+from tqdm import tqdm
+
+from config import ENGINE_PATH
+from utils import get_game_id
 
 MAX_ANALYSIS_SECONDS_PER_MOVE = 0.50
 SCORES_DIRECTORY = 'engine_scores/'
@@ -67,7 +70,12 @@ class Engine:
         games_analyses = {}
         for game in tqdm(games):
             game_id = get_game_id(game)
-            games_analyses[game_id] = self.analyse_game(game)
+            try:
+                games_analyses[game_id] = self.analyse_game(game)
+            except EngineError as e:
+                print(game_id)
+                print(e)
+                continue
             with open(SCORES_DIRECTORY + game_id + '.scores.pkl', 'wb') as handle:
                 pickle.dump(games_analyses[game_id], handle, protocol=pickle.HIGHEST_PROTOCOL)
         return games_analyses
@@ -76,6 +84,6 @@ class Engine:
         for filename in glob(os.path.join(SCORES_DIRECTORY, '*.scores.pkl')):
             with open(os.path.join(os.getcwd(), filename), 'rb') as handle:  # open in readonly mode
                 game_analysis = pickle.load(handle)
-                game_id = filename.split('.')[0][17:]
+                game_id = filename.split('.')[0].split('/')[-1]
                 self.games_analyses = {**self.games_analyses, game_id: game_analysis}
         return self.games_analyses

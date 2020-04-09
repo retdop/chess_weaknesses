@@ -6,7 +6,7 @@ from MistakeAnalyzer import MistakeAnalyzer
 from ThemeAnalyzer import ThemeAnalyzer
 from EndgameAnalyzer import EndgameAnalyzer
 
-MAX_NUMBER_OF_GAMES_TO_ANALYSE = 5
+MAX_NUMBER_OF_GAMES_TO_ANALYSE = 50
 GAMES_ANALYSES_FILENAME = 'scores.pkl'
 PLAYER_NAME = 'pavermesh'
 
@@ -24,16 +24,15 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer, EndgameAnalyzer):
     # { game_scores: List, best_moves: List}
 
     def __init__(self, engine=None, games_filename=None,
-                 load_scores=True,
+                 calculate_scores=False,
                  max_number_of_games_to_analyse=MAX_NUMBER_OF_GAMES_TO_ANALYSE,
                  player=PLAYER_NAME):
         self.player = player
         self.max_number_of_games_to_analyse = max_number_of_games_to_analyse
         self.engine = engine or Engine()
         self.load_games(games_filename=games_filename)
-        if load_scores:
-            self.engine.load_games_analyses()
-        else:
+        self.engine.load_games_analyses()
+        if calculate_scores:
             self.pre_compute_engine_analyses()
         for game in self.games.values():
             game['engine_analysis'] = self.engine.get_game_analysis(game)
@@ -73,7 +72,7 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer, EndgameAnalyzer):
 
 if __name__ == '__main__':
     analysis = Analysis(games_filename=GAMES_FILENAME,
-                        load_scores=True,
+                        calculate_scores=True,
                         player=PLAYER_NAME)
     analysis.find_mistakes()
     analysis.thematize_games()
