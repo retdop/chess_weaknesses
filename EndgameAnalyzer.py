@@ -109,28 +109,27 @@ class EndgameAnalyzer:
             plt.hist(game_score_differences, bins=50, range=(-20, 20), alpha=0.7, label='All scores differences')
             for endgame, endgame_score_differences in game_score_diff.items():
                 plt.hist(endgame_score_differences, bins=50, range=(-20, 20), alpha=0.7,
-                         label=endgame + ' scores differences')
+                         label=endgame)
             plt.legend()
             plt.title(game_id + ' endgame analysis')
             # plt.show()
             plt.savefig('figures/' + self.player + '/' + game_id + '_endgames successes.png')
             plt.close()
 
-        most_common_endgames = Counter(endgames).most_common(10)
-        plt.hist(games_score_differences, bins=50, range=(-2000, 2000), alpha=0.7, label='All scores differences')
-        for theme, theme_score_differences in games_score_diff.items():
-            plt.hist(theme_score_differences, bins=50, range=(-2000, 2000), alpha=0.7,
-                     label=theme + ' scores differences')
+        most_common_endgames = [e for e, _ in Counter(endgames).most_common(10)]
+        for endgame, endgame_score_differences in games_score_diff.items():
+            if endgame in most_common_endgames:
+                plt.hist(endgame_score_differences, bins=50, range=(-2000, 2000), alpha=0.7,
+                         label=endgame)
         plt.legend()
         plt.title('All games endgames analysis')
         plt.savefig('figures/' + self.player + '/' + 'endgames successes.png')
         plt.close()
 
-        plt.hist(games_score_differences, bins=100, range=(-500, 500), alpha=0.7, label='All scores differences')
         for endgame, endgame_score_differences in games_score_diff.items():
             if endgame in most_common_endgames:
                 plt.hist(endgame_score_differences, bins=100, range=(-500, 500), alpha=0.7,
-                         label=endgame + ' scores differences')
+                         label=endgame)
         plt.legend()
         plt.ylim((0, 20))
         plt.title('All games endgames analysis - zoomed')

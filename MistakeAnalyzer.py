@@ -21,7 +21,7 @@ class MistakeAnalyzer:
         game_id = get_game_id(raw_game)
 
         if not game_engine_analysis:
-            print('Analysis could not retrieve analysis for game : ' + game_id)
+            print('Could not retrieve analysis for game : ' + game_id)
             return
 
         score = game_engine_analysis['game_scores'][0]

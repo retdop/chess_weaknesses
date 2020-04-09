@@ -69,25 +69,23 @@ class ThemeAnalyzer:
             plt.hist(game_score_differences, bins=50, range=(-2000, 2000), alpha=0.7, label='All scores differences')
             for theme, theme_score_differences in game_score_diff.items():
                 plt.hist(theme_score_differences, bins=50, range=(-2000, 2000), alpha=0.7,
-                         label=theme + ' scores differences')
+                         label=theme)
             plt.legend()
             plt.title(game_id + ' themes analysis')
             plt.savefig('figures/' + self.player + '/' + game_id + '_themes successes.png')
             plt.close()
 
-        plt.hist(games_score_differences, bins=50, range=(-2000, 2000), alpha=0.7, label='All scores differences')
         for theme, theme_score_differences in games_score_diff.items():
             plt.hist(theme_score_differences, bins=50, range=(-2000, 2000), alpha=0.7,
-                     label=theme + ' scores differences')
+                     label=theme)
         plt.legend()
         plt.title('All games themes analysis')
         plt.savefig('figures/' + self.player + '/' + 'themes successes.png')
         plt.close()
 
-        plt.hist(games_score_differences, bins=100, range=(-500, 500), alpha=0.7, label='All scores differences')
         for theme, theme_score_differences in games_score_diff.items():
             plt.hist(theme_score_differences, bins=100, range=(-500, 500), alpha=0.7,
-                     label=theme + ' scores differences')
+                     label=theme)
         plt.legend()
         plt.ylim((0, 20))
         plt.title('All games themes analysis - zoomed')
