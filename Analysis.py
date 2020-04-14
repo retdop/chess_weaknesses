@@ -6,7 +6,7 @@ from MistakeAnalyzer import MistakeAnalyzer
 from ThemeAnalyzer import ThemeAnalyzer
 from EndgameAnalyzer import EndgameAnalyzer
 
-MAX_NUMBER_OF_GAMES_TO_ANALYSE = 50
+MAX_NUMBER_OF_GAMES_TO_ANALYSE = 5000
 GAMES_ANALYSES_FILENAME = 'scores.pkl'
 PLAYER_NAME = 'pavermesh'
 
@@ -59,11 +59,16 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer, EndgameAnalyzer):
             game = None
 
             while (game or len(games) == 0) and len(games) < self.max_number_of_games_to_analyse:
-                game = read_game(filename)
-                if game is not None:
-                    game_id = get_game_id(game)
-                    games[game_id] = {}
-                    games[game_id]['raw'] = game
+                try:
+                    game = read_game(filename)
+                    if game is not None:
+                        variant = game.headers['Variant']
+                        if variant == 'Standard':
+                            game_id = get_game_id(game)
+                            games[game_id] = {}
+                            games[game_id]['raw'] = game
+                except ValueError as e:
+                    print(len(games), e)
 
         self.games = games
 
@@ -72,7 +77,7 @@ class Analysis(MistakeAnalyzer, ThemeAnalyzer, EndgameAnalyzer):
 
 if __name__ == '__main__':
     analysis = Analysis(games_filename=GAMES_FILENAME,
-                        calculate_scores=True,
+                        calculate_scores=False,
                         player=PLAYER_NAME)
     analysis.find_mistakes()
     analysis.thematize_games()
