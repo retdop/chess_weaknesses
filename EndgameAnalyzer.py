@@ -36,8 +36,12 @@ def piece_count(position, piece, player_color):
 
 
 def pieces_count(position, player_color):
-    return 'K+' + '+'.join([str(piece_count(position, piece, player_color)) + str(piece_name[piece])
-                            for piece in pieces if piece_count(position, piece, player_color) > 0])
+    piece_cnt = 'K+' + '+'.join([str(piece_count(position, piece, player_color)) + str(piece_name[piece])
+                                 for piece in pieces if piece_count(position, piece, player_color) > 0])
+    if piece_cnt == 'K+':
+        return 'K'
+    else:
+        return piece_cnt
 
 
 class EndgameAnalyzer:
@@ -112,22 +116,28 @@ class EndgameAnalyzer:
                          label=endgame)
             plt.legend()
             plt.title(game_id + ' endgame analysis')
-            # plt.show()
             plt.savefig('figures/' + self.player + '/' + game_id + '_endgames successes.png')
             plt.close()
 
-        most_common_endgames = [e for e, _ in Counter(endgames).most_common(10)]
-        for endgame, endgame_score_differences in games_score_diff.items():
-            if endgame in most_common_endgames:
-                plt.hist(endgame_score_differences, bins=50, range=(-2000, 2000), alpha=0.7,
-                         label=endgame)
-        plt.legend()
-        plt.title('All games endgames analysis')
+        n_endgames = 20
+        most_common_endgames = {e: cnt for e, cnt in Counter(endgames).most_common(n_endgames)}
+        fig, axs = plt.subplots(n_endgames, 1, figsize=(10, 75))
+        fig.suptitle('Most common endgames analysis')
+        i = 0
+        for endgame, cnt in most_common_endgames.items():
+            if endgame in games_score_diff:
+                endgame_score_differences = games_score_diff[endgame]
+                axs[i].hist(endgame_score_differences, bins=100, range=(-2000, 2000), alpha=0.7,
+                            label=endgame, density=False)
+                axs[i].title.set_text(endgame + ' - ' + str(most_common_endgames[endgame]) + ' games - '
+                                      + str(len(endgame_score_differences)) + ' positions')
+                axs[i].legend()
+                i += 1
         plt.savefig('figures/' + self.player + '/' + 'endgames successes.png')
         plt.close()
 
         for endgame, endgame_score_differences in games_score_diff.items():
-            if endgame in most_common_endgames:
+            if endgame in most_common_endgames.keys():
                 plt.hist(endgame_score_differences, bins=100, range=(-500, 500), alpha=0.7,
                          label=endgame)
         plt.legend()
